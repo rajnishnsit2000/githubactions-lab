@@ -29,11 +29,11 @@ jobs:
       - name: Fetch Secrets From Conjur Cloud
         uses: cyberark/conjur-action@v2.1.0
         with:
-          url: https://anzservices.secretsmgr.cyberark.cloud/api
+          url: https://apj-secrets.secretsmgr.cyberark.cloud/api
           account: conjur
-          authn_id: GitHub-Apps
-          host_id: 'host/data/apps/cicd-apps/github/Workflow-App1'
-          secrets: 'data/vault/Dev_Ops/Database-DB_MSSQL_LOC-10.0.0.0.10-db_admin/username|MY_DB_USERNAME;data/vault/Dev_Ops/Database-DB_MSSQL_LOC-10.0.0.0.10-db_admin/address|MY_DB_ADDRESS;data/vault/Dev_Ops/Database-DB_MSSQL_LOC-10.0.0.0.10-db_admin/password|MY_DB_PASSWORD'
+          authn_id: rajgithubactionauthenticator
+    #      host_id: 'host/data/apps/cicd-apps/github/Workflow-App1'
+          secrets: 'data/vault/rajnishgargconjurcloudsafe/Demomysqlaccount/password|MY_DB_PASSWORD;data/vault/rajnishgargconjurcloudsafe/Demomysqlaccount/address|MY_DB_ADDRESS;data/vault/rajnishgargconjurcloudsafe/Demomysqlaccount/username|MY_DB_USERNAME'
 
       - name: Verify Secret Fetch
         run: |
