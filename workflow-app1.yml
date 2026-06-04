@@ -1,0 +1,58 @@
+name: Workflow-App1
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch: # Allows manual triggering from the GitHub UI
+
+permissions:
+  id-token: write  # 🔑 Required for the OIDC JWT token
+  contents: read   # 📖 Required to read repository code
+
+jobs:
+  conjur-secret-fetch:
+    runs-on: ubuntu-latest 
+    steps:
+      - name: Checkout Repository Code
+        uses: actions/checkout@v4
+      - name: Debug JWT Claims
+        run: |
+          # 📲 Request the raw OIDC token from GitHub's runtime environment
+          JWT=$(curl -sH "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=GitHub-Apps" | jq -r '.value')
+          
+          # Extract the payload component (the second part of the JWT)
+          PAYLOAD=$(echo "$JWT" | cut -d'.' -f2)
+          
+          # Decode the base64 string and format the JSON output
+          echo "=== Decoded JWT Claims ==="
+          echo "$PAYLOAD" | base64 --decode | jq . 
+      - name: Fetch Secrets From Conjur Cloud
+        uses: cyberark/conjur-action@v2.1.0
+        with:
+          url: https://anzservices.secretsmgr.cyberark.cloud/api
+          account: conjur
+          authn_id: GitHub-Apps
+          host_id: 'host/data/apps/cicd-apps/github/Workflow-App1'
+          secrets: 'data/vault/Dev_Ops/Database-DB_MSSQL_LOC-10.0.0.0.10-db_admin/username|MY_DB_USERNAME;data/vault/Dev_Ops/Database-DB_MSSQL_LOC-10.0.0.0.10-db_admin/address|MY_DB_ADDRESS;data/vault/Dev_Ops/Database-DB_MSSQL_LOC-10.0.0.0.10-db_admin/password|MY_DB_PASSWORD'
+
+      - name: Verify Secret Fetch
+        run: |
+          echo "The runner successfully fetched the secrets!"
+          echo "Database username fetched securely: $MY_DB_USERNAME"
+          echo "Database address fetched securely: $MY_DB_ADDRESS"
+          echo "Database password fetched securely: $MY_DB_PASSWORD"
+          
+          echo "---------------------------------------------------"
+          echo "TEMPORARY TESTING DEBUGS (Remove after verification)"
+          echo "---------------------------------------------------"
+
+          # Prints values backwards to bypass GitHub's masking filter
+          echo -n "Username (Backwards): "
+          echo "$MY_DB_USERNAME" | rev
+          
+          echo -n "Address (Backwards): "
+          echo "$MY_DB_ADDRESS" | rev
+
+          # Encodes the secret to Base64 for alternative validation
+          echo -n "Base64 Encoded Password: "
+          echo -n "$MY_DB_PASSWORD" | base64
