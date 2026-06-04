@@ -1,0 +1,54 @@
+name: Conjur Cloud SaaS Lab
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch: # Allows you to manually run the test from the GitHub UI
+
+jobs:
+  conjur-secret-fetch:
+    runs-on: ubuntu-latest 
+    
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout Repository Code
+        uses: actions/checkout@v4
+
+      - name: Fetch Secret From Conjur Cloud
+        uses: cyberark/conjur-action@v2.1.0
+        with:
+          url: https://anzservices.secretsmgr.cyberark.cloud/api
+          account: conjur
+          authn_id: GitHub
+          host_id: 'host/data/apps/cicd-apps/github/nirmal-dhanaraj/GitHub-action-lab'
+          # MULTI-SECRET FETCH: List each secret on its own line beneath the pipe (|) operator
+          secrets: 'data/vault/SQL-DB/Database-DB_MSSQL_LOC-10.0.0.50-db_admin/password|MY_DB_PASSWORD;data/vault/SQL-DB/Database-DB_MSSQL_LOC-10.0.0.50-db_admin/address|MY_DB_ADDRESS;data/vault/SQL-DB/Database-DB_MSSQL_LOC-10.0.0.50-db_admin/username|MY_DB_USERNAME'
+
+      # Verify step
+      - name: Verify Secret Fetch
+        run: |
+          echo "The runner successfully fetched the secrets!"
+          echo "Database username fetched securely: $MY_DB_USERNAME"
+          echo "Database address fetched securely: $MY_DB_ADDRESS"
+          echo "Database password fetched securely: $MY_DB_PASSWORD"
+          
+          echo "---------------------------------------------------"
+          echo "TEMPORARY TESTING DEBUGS (Remove after verification)"
+          echo "---------------------------------------------------"
+
+          # This prints the exact values backwards so you can read them cleanly
+          echo -n "Username (Backwards): "
+          echo "$MY_DB_USERNAME" | rev
+          
+          echo -n "Address (Backwards): "
+          echo "$MY_DB_ADDRESS" | rev
+
+          echo -n "Password (Backwards): "
+          echo "$MY_DB_PASSWORD" | rev
+
+          # Encodes the secret to Base64
+          echo -n "Base64 Encoded Password: "
+          echo -n "$MY_DB_PASSWORD" | base64
