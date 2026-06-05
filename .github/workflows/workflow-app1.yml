@@ -31,7 +31,7 @@ jobs:
         with:
           url: https://apj-secrets.secretsmgr.cyberark.cloud/api
           account: conjur
-          authn_id: rajgithubactionsauthn
+          authn_id: rajdemovideogithub
     #      host_id: 'host/data/apps/cicd-apps/github/Workflow-App1'
           secrets: 'data/vault/rajnishgargconjurcloudsafe/Demomysqlaccount/password|MY_DB_PASSWORD;data/vault/rajnishgargconjurcloudsafe/Demomysqlaccount/address|MY_DB_ADDRESS;data/vault/rajnishgargconjurcloudsafe/Demomysqlaccount/username|MY_DB_USERNAME'
 
