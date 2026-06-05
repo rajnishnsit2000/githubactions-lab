@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Debug JWT Claims
         run: |
-          # 📲 Request the raw OIDC token from GitHub's runtime environment 123456
+          # 📲 Request the raw OIDC token from GitHub's runtime environment 1234567
           JWT=$(curl -sH "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=GitHub-Apps" | jq -r '.value')
           
           # Extract the payload component (the second part of the JWT) 123
